@@ -95,6 +95,8 @@ struct no_os_pwm_desc {
 	enum no_os_pwm_polarity polarity;
 	/** PWM generator enabled */
 	bool enabled;
+	/** PWM generator initialized. */
+	bool initialized;
 	/** PWM gpio pin instance */
 	struct no_os_gpio_desc *pwm_gpio;
 	/* IRQ ID */
