@@ -75,6 +75,7 @@ enum stm32_pwm_trigger_out {
 	PWM_TRGO_OC3REF,
 	PWM_TRGO_OC4REF,
 };
+
 /**
  * @struct stm32_pwm_init_param
  * @brief Structure holding the STM32 PWM parameters.
@@ -85,9 +86,11 @@ struct stm32_pwm_init_param {
 	/** Timer autoreload enable */
 	bool timer_autoreload;
 	/** Timer output compare Mode */
-	enum TimOCMode mode;
+	uint32_t mode;
 	/** PWM timer channel */
 	uint32_t timer_chn;
+	/** PWM timer mode */
+	uint32_t timer_mode;
 	/** Complementary channel */
 	bool complementary_channel;
 	/** Get timer source clock function */
@@ -124,7 +127,7 @@ struct stm32_pwm_desc {
 	/** Timer autoreload enable */
 	bool timer_autoreload;
 	/** Timer output compare Mode */
-	enum TimOCMode mode;
+	uint32_t mode;
 	/** PWM timer channel */
 	uint32_t timer_chn;
 	/** Complementary channel */

@@ -179,9 +179,23 @@ static int32_t stm32_init_timer(struct stm32_pwm_desc *desc,
 
 	desc->htimer.Instance = base;
 	desc->htimer.Init.Prescaler = sparam->prescaler;
-	desc->htimer.Init.CounterMode = TIM_COUNTERMODE_UP;
+	desc->htimer.Init.CounterMode = sparam->timer_mode;
 	desc->htimer.Init.Period = period;
-	desc->htimer.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+
+	switch (sparam->clock_divider) {
+	case 1:
+		desc->htimer.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+		break;
+	case 2:
+		desc->htimer.Init.ClockDivision = TIM_CLOCKDIVISION_DIV2;
+		break;
+	case 4:
+		desc->htimer.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
+		break;
+	default:
+		return -EINVAL;
+	}
+
 	desc->htimer.Init.AutoReloadPreload = sparam->timer_autoreload ?
 					      TIM_AUTORELOAD_PRELOAD_ENABLE : TIM_MASTERSLAVEMODE_DISABLE;
 	desc->htimer.Init.RepetitionCounter = sparam->repetitions;
@@ -302,8 +316,8 @@ error:
  * @param param - The structure containing PWM init parameters.
  * @return 0 in case of success, negative error code otherwise.
  */
-static int32_t stm32_init_pwm(struct stm32_pwm_desc *desc,
-			      const struct no_os_pwm_init_param *param)
+static int32_t  stm32_init_pwm(struct stm32_pwm_desc *desc,
+			       const struct no_os_pwm_init_param *param)
 {
 	uint32_t pwm_pulse_width;
 	float duty_cycle_percentage;
@@ -313,19 +327,7 @@ static int32_t stm32_init_pwm(struct stm32_pwm_desc *desc,
 	uint32_t period = desc->htimer.Init.Period;
 	struct stm32_pwm_init_param *sparam = param->extra;
 
-	switch (sparam->mode) {
-	case TIM_OC_TOGGLE:
-		ocmode = TIM_OCMODE_TOGGLE;
-		break;
-	case TIM_OC_PWM1:
-		ocmode = TIM_OCMODE_PWM1;
-		break;
-	case TIM_OC_PWM2:
-		ocmode = TIM_OCMODE_PWM2;
-		break;
-	default:
-		return -EINVAL;
-	}
+	ocmode = sparam->mode;
 
 	switch (sparam->timer_chn) {
 #if defined(TIM_CHANNEL_1)
@@ -379,7 +381,7 @@ static int32_t stm32_init_pwm(struct stm32_pwm_desc *desc,
 		return -EINVAL;
 	};
 
-	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+	sConfigOC.OCFastMode = TIM_OCFAST_ENABLE;
 	sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
 	sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
 	if (HAL_TIM_PWM_ConfigChannel(&desc->htimer, &sConfigOC, chn) != HAL_OK)
@@ -414,6 +416,7 @@ int32_t stm32_pwm_init(struct no_os_pwm_desc **desc,
 	if (!descriptor)
 		return -ENOMEM;
 
+	descriptor->initialized = false;
 	extra = (struct stm32_pwm_desc *)calloc(1, sizeof(*extra));
 	if (!extra) {
 		ret = -ENOMEM;
@@ -444,6 +447,7 @@ int32_t stm32_pwm_init(struct no_os_pwm_desc **desc,
 	descriptor->phase_ns = param->phase_ns;
 	descriptor->polarity = param->polarity;
 	descriptor->irq_id = param->irq_id;
+	descriptor->initialized = true;
 	*desc = descriptor;
 
 	return 0;
@@ -667,13 +671,43 @@ int32_t stm32_pwm_set_duty_cycle(struct no_os_pwm_desc *desc,
 	int32_t ret;
 	struct no_os_pwm_init_param param;
 	struct stm32_pwm_init_param sparam;
+	struct stm32_pwm_desc *extra;
+	float duty_cycle_percentage;
+	uint32_t pwm_pulse_width;
 
 	if (!desc || !desc->extra)
 		return -EINVAL;
 
+	if (desc->initialized) {
+		extra = desc->extra;
+		duty_cycle_percentage = ((float)duty_cycle_ns / desc->period_ns) * 100;
+		pwm_pulse_width = (uint32_t)((extra->htimer.Init.Period + 1) *
+					     duty_cycle_percentage) / (100);
+
+		switch (extra->timer_chn) {
+		case 1:
+			extra->htimer.Instance->CCR1 = pwm_pulse_width;
+
+			return 0;
+		case 2:
+			extra->htimer.Instance->CCR2 = pwm_pulse_width;
+
+			return 0;
+		case 3:
+			extra->htimer.Instance->CCR3 = pwm_pulse_width;
+
+			return 0;
+		case 4:
+			extra->htimer.Instance->CCR4 = pwm_pulse_width;
+
+			return 0;
+		}
+	}
+
 	param.duty_cycle_ns = duty_cycle_ns;
 	param.period_ns = desc->period_ns;
 	param.phase_ns = desc->phase_ns;
+	param.polarity = desc->polarity;
 	sparam.mode = ((struct stm32_pwm_desc *)desc->extra)->mode;
 	sparam.timer_chn = ((struct stm32_pwm_desc *)desc->extra)->timer_chn;
 	sparam.complementary_channel = ((struct stm32_pwm_desc*)
