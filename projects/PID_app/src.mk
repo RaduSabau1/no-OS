@@ -23,7 +23,7 @@ INCS += $(INCLUDE)/no_os_delay.h	\
 	$(INCLUDE)/no_os_lf256fifo.h	\
 	$(INCLUDE)/no_os_util.h		\
 	$(INCLUDE)/no_os_units.h	\
-	$(INCLUDE)/no_os_spi.h	\
+	$(INCLUDE)/no_os_spi.h		\
 	$(INCLUDE)/no_os_pwm.h		\
 	$(INCLUDE)/no_os_mutex.h
 
@@ -38,6 +38,18 @@ SRCS += $(DRIVERS)/api/no_os_gpio.c	\
 	$(NO-OS)/util/no_os_util.c	\
 	$(NO-OS)/util/no_os_alloc.c	\
 	$(NO-OS)/util/no_os_mutex.c
+
+SRCS += $(PROJECT)/transform/vector_transfs.c
+INCS += $(PROJECT)/transform/vector_transfs.h
+
+SRCS += $(PROJECT)/svpwm/svpwm.c
+INCS += $(PROJECT)/svpwm/svpwm.h
+
+SRCS += $(PROJECT)/estimators/fp_pid.c
+INCS += $(PROJECT)/estimators/fp_pid.h
+
+SRCS += $(PROJECT)/estimators/im_estimators.c
+INCS += $(PROJECT)/estimators/im_estimators.h
 
 INCS += $(DRIVERS)/motor/tmc4671/tmc4671.h
 SRCS += $(DRIVERS)/motor/tmc4671/tmc4671.c
