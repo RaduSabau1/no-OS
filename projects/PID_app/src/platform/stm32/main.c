@@ -1,11 +1,17 @@
 #include "platform_includes.h"
 #include "common_data.h"
 #include "no_os_error.h"
-#include "main_example.h"
+
+#ifdef EXT_OL_EXAMPLE
+#include "ext_ol_example.h"
+#endif
+
+#ifdef INT_OL_THETA_EXAMPLE
+#include "int_ol_theta_example.h"
+#endif
 
 int main()
 {
-
 	int ret = -EINVAL;
 
 	struct no_os_uart_desc *uart_desc;
@@ -18,7 +24,21 @@ int main()
 
 	no_os_uart_stdio(uart_desc);
 
-	ret = main_example_main();
+#ifdef EXT_OL_EXAMPLE
+	ret = ext_ol_example_main();
+#endif
+
+#ifdef INT_OL_THETA_EXAMPLE
+	ret = int_ol_theta_example_main();
+#endif
+
+#ifdef INT_OL_DQWT_EXAMPLE
+	ret = int_ol_dqwt_example_main();
+#endif
+
+#ifdef INT_OL_ALL_EXAMPLE
+	ret = int_ol_all_example_main();
+#endif
 
 	no_os_uart_remove(uart_desc);
 
