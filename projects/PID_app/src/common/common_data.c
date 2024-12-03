@@ -86,8 +86,8 @@ struct no_os_gpio_init_param tmc6100_wl_gpio_param = {
 
 struct no_os_pwm_init_param tmc6100_uh_pwm_param = {
 	.id = TMC6100_PWMH_ID,
-	.period_ns = 20000,
-	.duty_cycle_ns = 10000,
+	.period_ns = PWM_SECTOR_PERIOD_NS,
+	.duty_cycle_ns = PWM_SECTOR_PERIOD_NS / 2,
 	.polarity = NO_OS_PWM_POLARITY_HIGH,
 	.platform_ops = PWM_OPS,
 	.extra = PWM_UH_EXTRA,
@@ -96,8 +96,8 @@ struct no_os_pwm_init_param tmc6100_uh_pwm_param = {
 
 struct no_os_pwm_init_param tmc6100_vh_pwm_param = {
 	.id = TMC6100_PWMH_ID,
-	.period_ns = 20000,
-	.duty_cycle_ns = 10000,
+	.period_ns = PWM_SECTOR_PERIOD_NS,
+	.duty_cycle_ns = PWM_SECTOR_PERIOD_NS / 2,
 	.polarity = NO_OS_PWM_POLARITY_HIGH,
 	.platform_ops = PWM_OPS,
 	.extra = PWM_VH_EXTRA,
@@ -106,8 +106,8 @@ struct no_os_pwm_init_param tmc6100_vh_pwm_param = {
 
 struct no_os_pwm_init_param tmc6100_wh_pwm_param = {
 	.id = TMC6100_PWMH_ID,
-	.period_ns = 20000,
-	.duty_cycle_ns = 10000,
+	.period_ns = PWM_SECTOR_PERIOD_NS,
+	.duty_cycle_ns = PWM_SECTOR_PERIOD_NS / 2,
 	.polarity = NO_OS_PWM_POLARITY_HIGH,
 	.platform_ops = PWM_OPS,
 	.extra = PWM_WH_EXTRA,
@@ -116,8 +116,8 @@ struct no_os_pwm_init_param tmc6100_wh_pwm_param = {
 
 struct no_os_pwm_init_param tmc6100_ul_pwm_param = {
 	.id = TMC6100_PWML_ID,
-	.period_ns = 20000,
-	.duty_cycle_ns = 10000,
+	.period_ns = PWM_SECTOR_PERIOD_NS,
+	.duty_cycle_ns = PWM_SECTOR_PERIOD_NS / 2,
 	.polarity = NO_OS_PWM_POLARITY_HIGH,
 	.platform_ops = PWM_OPS,
 	.extra = PWM_UL_EXTRA,
@@ -126,8 +126,8 @@ struct no_os_pwm_init_param tmc6100_ul_pwm_param = {
 
 struct no_os_pwm_init_param tmc6100_vl_pwm_param = {
 	.id = TMC6100_PWML_ID,
-	.period_ns = 20000,
-	.duty_cycle_ns = 10000,
+	.period_ns = PWM_SECTOR_PERIOD_NS,
+	.duty_cycle_ns = PWM_SECTOR_PERIOD_NS / 2,
 	.polarity = NO_OS_PWM_POLARITY_HIGH,
 	.platform_ops = PWM_OPS,
 	.extra = PWM_VL_EXTRA,
@@ -136,8 +136,8 @@ struct no_os_pwm_init_param tmc6100_vl_pwm_param = {
 
 struct no_os_pwm_init_param tmc6100_wl_pwm_param = {
 	.id = TMC6100_PWML_ID,
-	.period_ns = 20000,
-	.duty_cycle_ns = 10000,
+	.period_ns = PWM_SECTOR_PERIOD_NS,
+	.duty_cycle_ns = PWM_SECTOR_PERIOD_NS / 2,
 	.polarity = NO_OS_PWM_POLARITY_HIGH,
 	.platform_ops = PWM_OPS,
 	.extra = PWM_WL_EXTRA,
@@ -153,5 +153,5 @@ struct tmc6100_init_param tmc6100_ip = {
 	.ul_pwm_param = &tmc6100_ul_pwm_param,
 	.vl_pwm_param = &tmc6100_vl_pwm_param,
 	.wl_pwm_param = &tmc6100_wl_pwm_param,
-	.pwm_period_ns = 20000,
+	.pwm_period_ns = PWM_SECTOR_PERIOD_NS,
 };
