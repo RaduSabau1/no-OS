@@ -48,8 +48,8 @@ INCS += $(PROJECT)/svpwm/svpwm.h
 SRCS += $(PROJECT)/estimators/fp_pid.c
 INCS += $(PROJECT)/estimators/fp_pid.h
 
-SRCS += $(PROJECT)/estimators/im_estimators.c
-INCS += $(PROJECT)/estimators/im_estimators.h
+# SRCS += $(PROJECT)/estimators/im_estimators.c
+# INCS += $(PROJECT)/estimators/im_estimators.h
 
 INCS += $(DRIVERS)/motor/tmc4671/tmc4671.h
 SRCS += $(DRIVERS)/motor/tmc4671/tmc4671.c
