@@ -2,12 +2,16 @@
 #include "common_data.h"
 #include "no_os_error.h"
 
-#ifdef EXT_OL_EXAMPLE
-#include "ext_ol_example.h"
+#ifdef EXT_LOOP_EXAMPLE
+#include "ext_loop_example.h"
 #endif
 
-#ifdef INT_OL_THETA_EXAMPLE
-#include "int_ol_theta_example.h"
+#ifdef INT_LOOP_EXAMPLE
+#include "int_loop_example.h"
+#endif
+
+#ifdef OPEN_LOOP_EXAMPLE
+#include "open_loop_example.h"
 #endif
 
 int main()
@@ -24,20 +28,16 @@ int main()
 
 	no_os_uart_stdio(uart_desc);
 
-#ifdef EXT_OL_EXAMPLE
-	ret = ext_ol_example_main();
+#ifdef EXT_LOOP_EXAMPLE
+	ret = ext_loop_example_main();
 #endif
 
-#ifdef INT_OL_THETA_EXAMPLE
-	ret = int_ol_theta_example_main();
+#ifdef INT_LOOP_EXAMPLE
+	ret = int_loop_example_main();
 #endif
 
-#ifdef INT_OL_DQWT_EXAMPLE
-	ret = int_ol_dqwt_example_main();
-#endif
-
-#ifdef INT_OL_ALL_EXAMPLE
-	ret = int_ol_all_example_main();
+#ifdef OPEN_LOOP_EXAMPLE
+	ret = open_loop_example_main();
 #endif
 
 	no_os_uart_remove(uart_desc);

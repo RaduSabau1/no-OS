@@ -10,7 +10,7 @@
 
 #define	UART_IRQ_ID			USART3_IRQn
 #define UART_DEVICE_ID			1
-#define UART_BAUDRATE			115200
+#define UART_BAUDRATE			1000000
 
 #define UART_EXTRA			&pid_uart_extra
 #define UART_OPS			&stm32_uart_ops
