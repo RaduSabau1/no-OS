@@ -42,11 +42,8 @@ SRCS += $(DRIVERS)/api/no_os_gpio.c	\
 SRCS += $(PROJECT)/transform/vector_transfs.c
 INCS += $(PROJECT)/transform/vector_transfs.h
 
-SRCS += $(PROJECT)/svpwm/svpwm.c
-INCS += $(PROJECT)/svpwm/svpwm.h
-
-SRCS += $(PROJECT)/estimators/fp_pid.c
-INCS += $(PROJECT)/estimators/fp_pid.h
+SRCS += $(PROJECT)/pid_controller/fp_pid.c
+INCS += $(PROJECT)/pid_controller/fp_pid.h
 
 INCS += $(DRIVERS)/motor/tmc4671/tmc4671.h
 SRCS += $(DRIVERS)/motor/tmc4671/tmc4671.c

@@ -14,16 +14,6 @@ extern struct tmc4671_init_param tmc4671_ip;
 
 extern struct no_os_spi_init_param tmc6100_comm_param;
 extern struct no_os_gpio_init_param tmc6100_drv_en_param;
-extern struct no_os_gpio_init_param tmc6100_spe_param;
-extern struct no_os_gpio_init_param tmc6100_uh_param;
-extern struct no_os_gpio_init_param tmc6100_ul_param;
-extern struct no_os_gpio_init_param tmc6100_vh_param;
-extern struct no_os_gpio_init_param tmc6100_vl_param;
-extern struct no_os_gpio_init_param tmc6100_wh_param;
-extern struct no_os_gpio_init_param tmc6100_wl_param;
 extern struct tmc6100_init_param tmc6100_ip;
-
-extern struct no_os_pwm_init_param pwm_sector_ip;
-extern struct no_os_gpio_init_param pwmin_gpio_ip;
 
 #endif /* __COMMON_DATA_H__ */
