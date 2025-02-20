@@ -33,16 +33,16 @@ int ext_loop_example_main()
 	float elec_angle;
 	int16_t ud, uq;
 
-	int speed_stamp[5000] = {0};
-	int torque_stamp[5000] = {0};
-	int flux_stamp[5000] = {0};
+	int speed_stamp[1000] = {0};
+	int torque_stamp[1000] = {0};
+	int flux_stamp[1000] = {0};
 
 	float kp_speed, ki_speed, kp_torque, kp_flux;
-	kp_speed =1;
-	ki_speed =1;
-	kp_torque =1.027;
-	kp_flux =1.027;
-	ref_speed =3000;
+	kp_speed =1.5;
+	ki_speed =1.4;
+	kp_torque =1.1;
+	kp_flux =1.7;
+	ref_speed =745;
 	struct sPI speed_pi = {
 		.fDtSec = 0.000500f,
 		.fKp = kp_speed,
@@ -175,8 +175,8 @@ int ext_loop_example_main()
 		if (ret)
 			goto stop_motor;
 
-		if (i % 2 == 0) {
-			j = i / 2;
+		if (i % 10 == 0) {
+			j = i / 10;
 			speed_stamp[j] = meas_speed;
 			torque_stamp[j] = uq;
 			flux_stamp[j] = ud;
@@ -191,7 +191,7 @@ int ext_loop_example_main()
 
 	ret = tmc4671_set_pwm_sv_chop(tmc4671_desc, TMC4671_PWM_OFF);
 
-	for (j = 0; j < 5000; j++)
+	for (j = 0; j < 1000; j++)
 		pr_info("%i %i %i %i\n", j, speed_stamp[j], torque_stamp[j],
 			flux_stamp[j]);
 
