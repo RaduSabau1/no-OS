@@ -69,19 +69,11 @@ int ext_loop_example_main()
 	int flux_stamp[1000] = {0};
 
 	float kp_speed, ki_speed, kp_torque, kp_flux;
-<<<<<<< HEAD
 	kp_speed =1.04;
 	ki_speed =0.006;
 	kp_torque =0.72;
 	kp_flux =0.72;
 	ref_speed =4000;
-=======
-	kp_speed =1.5;
-	ki_speed =1.4;
-	kp_torque =1.1;
-	kp_flux =1.7;
-	ref_speed =745;
->>>>>>> f4da27a86 (projects: PID_app : Add Hardware-In-The-Loop support with Simulink)
 	struct sPI speed_pi = {
 		.fDtSec = 0.000500f,
 		.fKp = kp_speed,
