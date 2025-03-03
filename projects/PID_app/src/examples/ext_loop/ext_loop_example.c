@@ -38,7 +38,7 @@ int ext_loop_example_main()
 	int flux_stamp[1000] = {0};
 
 	float kp_speed, ki_speed, kp_torque, kp_flux;
-	kp_speed =1;
+	kp_speed =1.5;
 	ki_speed =1;
 	kp_torque =1;
 	kp_flux =1;
