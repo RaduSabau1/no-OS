@@ -21,7 +21,7 @@ struct no_os_spi_init_param tmc4671_spi_param = {
 
 struct tmc4671_init_param tmc4671_ip = {
 	.spi_param = &tmc4671_spi_param,
-	.motor_type = TMC4671_THREE_PHASE_BLDC,
+	.motor_type = TMC4671_SINGLE_PHASE_DC,
 	.no_pole_pairs = 4,
 };
 

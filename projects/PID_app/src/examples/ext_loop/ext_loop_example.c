@@ -12,9 +12,6 @@
 /* Unit Conversions. */
 #define RPM_TO_NQ(x)			((x) * 10)
 
-#define DEC_TO_DEG(x)			(((x) * 360) / 65535)
-#define DEG_TO_RAD(x)			((x) * 0.0174532925)
-
 /**
  * @brief Speed, Torque and Flux Loops are performed externally by the host.
  * @return 0 in case of success, negative error code otherwise.
@@ -24,24 +21,16 @@ int ext_loop_example_main()
 	struct tmc6100_desc *tmc6100_desc;
 	struct tmc4671_desc *tmc4671_desc;
 
-	struct sFFClarke ptFFClarke;
-	struct sFPark ptFPark;
-
 	int32_t ref_speed, meas_speed = 0;
-	uint32_t reg_val, angle, uq_ud;
+	uint32_t reg_val, uq_ud;
 	int i = 0, j = 0, ret;
-	float elec_angle;
-	int16_t ud, uq;
+	int16_t uq;
 
 	int speed_stamp[1000] = {0};
-	int torque_stamp[1000] = {0};
-	int flux_stamp[1000] = {0};
 
-	float kp_speed, ki_speed, kp_torque, kp_flux;
+	float kp_speed, ki_speed;
 	kp_speed =1.5;
 	ki_speed =1;
-	kp_torque =1;
-	kp_flux =1;
 	ref_speed =1000;
 	struct sPI speed_pi = {
 		.fDtSec = 0.000500f,
@@ -49,16 +38,6 @@ int ext_loop_example_main()
 		.fKi = ki_speed,
 		.fUpOutLim = 7000, /* Max Peak Torque Requirement. */
 		.fLowOutLim = -7000, /* Min Peak Torque Requirement. */
-	};
-	struct sP torque_pi = {
-		.fKp = kp_torque,
-		.fUpOutLim = 32767,
-		.fLowOutLim = -32767,
-	};
-	struct sP flux_pi = {
-		.fKp = kp_flux,
-		.fUpOutLim = 32767,
-		.fLowOutLim = -32767,
 	};
 
 	/* TMC6100 CFG. */
@@ -75,21 +54,7 @@ int ext_loop_example_main()
 	if (ret)
 		goto remove_tmc4671;
 
-	ret = tmc4671_reg_write(tmc4671_desc, TMC4671_ADC_I_SELECT_REG, 0x09000100);
-	if (ret)
-		goto remove_tmc4671;
-
-	ret = tmc4671_reg_write(tmc4671_desc, TMC4671_ADC_I1_SCALE_OFFSET_REG,
-				0x00108001);
-	if (ret)
-		goto remove_tmc4671;
-
-	ret = tmc4671_reg_write(tmc4671_desc, TMC4671_ADC_I0_SCALE_OFFSET_REG,
-				0x00108001);
-	if (ret)
-		goto remove_tmc4671;
-
-	ret = tmc4671_phi_e_sel(tmc4671_desc, TMC4671_PHI_E_HAL);
+	ret = tmc4671_phi_e_sel(tmc4671_desc, TMC4671_PHI_E_AENC);
 	if (ret)
 		goto remove_tmc4671;
 
@@ -130,46 +95,8 @@ int ext_loop_example_main()
 
 		tPI_calc(&speed_pi);
 
-		/* Angle Reading for Clarke and Park transforms. */
-		ret = tmc4671_read_angle(tmc4671_desc, &angle);
-		if (ret)
-			goto stop_motor;
-
-		elec_angle = DEG_TO_RAD(DEC_TO_DEG((float)angle));
-
-		/* Inside Loop (Torque and Flux). */
-		ret = tmc4671_reg_read(tmc4671_desc, TMC4671_ADC_IWY_IUX_REG, &reg_val);
-		if (ret)
-			goto stop_motor;
-
-		ptFFClarke.fA = (float)(int16_t)(reg_val & 0xFFFF);
-		ptFFClarke.fC = (float)(int16_t)((reg_val >> 16) & 0xFFFF);
-		ptFFClarke.fB = (ptFFClarke.fA + ptFFClarke.fC) * (-1);
-
-		tFFClarke_abc2albe(&ptFFClarke);
-
-		ptFPark.fAl = ptFFClarke.fAl;
-		ptFPark.fBe = ptFFClarke.fBe;
-		ptFPark.fCosAng = cosf(elec_angle);
-		ptFPark.fSinAng = sinf(elec_angle);
-
-		tFPark_albe2dq(&ptFPark);
-
-		uq = (int16_t)ptFPark.fQ;
-		ud = (int16_t)ptFPark.fD;
-
-		torque_pi.fIn = RPM_TO_NQ(speed_pi.fOut) - uq;
-		flux_pi.fIn = 0 - ud;
-
-		/* Flux PI Controller. */
-		tP_calc(&flux_pi);
-		/* Torque PI Controller. */
-		tP_calc(&torque_pi);
-
-		uq = (int16_t)(torque_pi.fOut);
-		ud = (int16_t)(flux_pi.fOut);
-
-		uq_ud = (((uint32_t)uq << 16) & 0xFFFF0000) | ((uint32_t)ud & 0xFFFF);
+		uq = (int16_t)RPM_TO_NQ(speed_pi.fOut);
+		uq_ud = (((uint32_t)uq << 16) & 0xFFFF0000);
 
 		ret = tmc4671_reg_write(tmc4671_desc, TMC4671_UQ_UD_EXT_REG, uq_ud);
 		if (ret)
@@ -178,8 +105,6 @@ int ext_loop_example_main()
 		if (i % 10 == 0) {
 			j = i / 10;
 			speed_stamp[j] = meas_speed;
-			torque_stamp[j] = uq;
-			flux_stamp[j] = ud;
 		}
 
 		i++;
@@ -192,8 +117,7 @@ int ext_loop_example_main()
 	ret = tmc4671_set_pwm_sv_chop(tmc4671_desc, TMC4671_PWM_OFF);
 
 	for (j = 0; j < 1000; j++)
-		pr_info("%i %i %i %i\n", j, speed_stamp[j], torque_stamp[j],
-			flux_stamp[j]);
+		pr_info("%i %i %i %i\n", j, speed_stamp[j]);
 
 	goto stop_en;
 
