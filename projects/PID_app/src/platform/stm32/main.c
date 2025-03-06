@@ -28,17 +28,7 @@ int main()
 
 	no_os_uart_stdio(uart_desc);
 
-#ifdef EXT_LOOP_EXAMPLE
 	ret = ext_loop_example_main();
-#endif
-
-#ifdef INT_LOOP_EXAMPLE
-	ret = int_loop_example_main();
-#endif
-
-#ifdef OPEN_LOOP_EXAMPLE
-	ret = open_loop_example_main();
-#endif
 
 	no_os_uart_remove(uart_desc);
 
