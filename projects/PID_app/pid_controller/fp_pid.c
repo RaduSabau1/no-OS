@@ -34,7 +34,7 @@ void tPI_calc(struct sPI *ptPI)
 
 	ptPI->fPout = ptPI->fIn * ptPI->fKp;
 
-	ptPI->fIout = ptPI->fIprevOut + 5 * ptPI->fDtSec * (ptPI->fPout * ptPI->fKi +
+	ptPI->fIout = ptPI->fIprevOut + 15 * ptPI->fDtSec * (ptPI->fPout * ptPI->fKi +
 			ptPI->fIprevIn);
 	ptPI->fIprevIn = ptPI->fPout;
 	ptPI->fIprevOut = ptPI->fIout;
