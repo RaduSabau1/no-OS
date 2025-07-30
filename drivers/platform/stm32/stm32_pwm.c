@@ -541,8 +541,8 @@ error:
  * @param param - The structure containing PWM init parameters.
  * @return 0 in case of success, negative error code otherwise.
  */
-static int32_t  stm32_init_pwm(struct stm32_pwm_desc *desc,
-			       const struct no_os_pwm_init_param *param)
+static int32_t stm32_init_pwm(struct stm32_pwm_desc *desc,
+			      const struct no_os_pwm_init_param *param)
 {
 	uint32_t pwm_pulse_width;
 	float duty_cycle_percentage;
@@ -712,7 +712,6 @@ int32_t stm32_pwm_init(struct no_os_pwm_desc **desc,
 	if (!descriptor)
 		return -ENOMEM;
 
-	descriptor->initialized = false;
 	extra = (struct stm32_pwm_desc *)calloc(1, sizeof(*extra));
 	if (!extra) {
 		ret = -ENOMEM;
@@ -760,7 +759,6 @@ int32_t stm32_pwm_init(struct no_os_pwm_desc **desc,
 	descriptor->phase_ns = param->phase_ns;
 	descriptor->polarity = param->polarity;
 	descriptor->irq_id = param->irq_id;
-	descriptor->initialized = true;
 	*desc = descriptor;
 
 	return 0;
@@ -1162,32 +1160,6 @@ int32_t stm32_pwm_set_duty_cycle(struct no_os_pwm_desc *desc,
 
 	if (!desc || !desc->extra)
 		return -EINVAL;
-
-	if (desc->initialized) {
-		extra = desc->extra;
-		duty_cycle_percentage = ((float)duty_cycle_ns / desc->period_ns) * 100;
-		pwm_pulse_width = (uint32_t)((extra->htimer.Init.Period + 1) *
-					     duty_cycle_percentage) / (100);
-
-		switch (extra->timer_chn) {
-		case 1:
-			extra->htimer.Instance->CCR1 = pwm_pulse_width;
-
-			return 0;
-		case 2:
-			extra->htimer.Instance->CCR2 = pwm_pulse_width;
-
-			return 0;
-		case 3:
-			extra->htimer.Instance->CCR3 = pwm_pulse_width;
-
-			return 0;
-		case 4:
-			extra->htimer.Instance->CCR4 = pwm_pulse_width;
-
-			return 0;
-		}
-	}
 
 	param.duty_cycle_ns = duty_cycle_ns;
 	param.period_ns = desc->period_ns;

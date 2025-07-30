@@ -1,7 +1,7 @@
 #include "no_os_error.h"
 #include "no_os_alloc.h"
 #include "no_os_delay.h"
-#include "stm32_pwm.h"
+#include "no_os_pwm.h"
 #include "tmc6100.h"
 
 int tmc6100_reg_read(struct tmc6100_desc *desc, uint8_t reg, uint32_t *val)
@@ -329,7 +329,7 @@ int tmc6100_init(struct tmc6100_desc **desc,
 	if (ret)
 		goto drv_en_error;
 
-	if (!init_param->ext_ctrl) {
+	if (init_param->ext_ctrl) {
 		init_param->uh_pwm_param->period_ns = init_param->pwm_period_ns;
 		init_param->uh_pwm_param->duty_cycle_ns = init_param->pwm_period_ns / 2;
 		ret = no_os_pwm_init(&descriptor->uh_pwm_desc, init_param->uh_pwm_param);

@@ -45,6 +45,6 @@ struct no_os_gpio_init_param tmc6100_drv_en_param = {
 struct tmc6100_init_param tmc6100_ip = {
 	.comm_param = &tmc6100_comm_param,
 	.drv_en_param = &tmc6100_drv_en_param,
-	.pwm_period_ns = PWM_SECTOR_PERIOD_NS,
-	.ext_ctrl = true,
+	.pwm_period_ns = 20000,
+	.ext_ctrl = false,
 };

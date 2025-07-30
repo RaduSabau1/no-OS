@@ -729,8 +729,6 @@ int32_t max_spi_transfer(struct no_os_spi_desc *desc,
 		else
 			spi->ctrl0 |= MXC_F_SPI_CTRL0_SS_CTRL;
 
-		_max_delay_config(desc, &msgs[i]);
-
 		if (msgs[i].tx_buff) {
 			/* Set the transfer size in the TX direction */
 			spi->ctrl1 = msgs[i].bytes_number;
@@ -775,7 +773,6 @@ int32_t max_spi_transfer(struct no_os_spi_desc *desc,
 		/* Disable the RX and TX FIFOs */
 		spi->dma &= ~(MXC_F_SPI_DMA_TX_FIFO_EN | MXC_F_SPI_DMA_RX_FIFO_EN);
 
-		no_os_udelay(msgs[i].cs_change_delay);
 	}
 
 	return 0;
