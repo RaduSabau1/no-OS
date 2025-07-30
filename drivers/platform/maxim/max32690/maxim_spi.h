@@ -67,4 +67,8 @@ struct max_spi_state {
 	uint32_t dma_req_tx;
 };
 
+int32_t max_spi_transfer(struct no_os_spi_desc *desc,
+			 struct no_os_spi_msg *msgs,
+			 uint32_t len);
+
 #endif
