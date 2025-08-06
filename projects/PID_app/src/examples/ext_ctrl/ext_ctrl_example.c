@@ -1,4 +1,4 @@
-#include "ext_loop_example.h"
+#include "ext_ctrl_example.h"
 #include "common_data.h"
 #include "tmc6100.h"
 #include "tmc4671.h"
@@ -19,7 +19,7 @@
  * @brief Speed, Torque and Flux Loops are performed externally by the host.
  * @return 0 in case of success, negative error code otherwise.
  */
-int ext_loop_example_main()
+int ext_ctrl_example_main()
 {
 	struct tmc6100_desc *tmc6100_desc;
 	struct tmc4671_desc *tmc4671_desc;
@@ -38,11 +38,11 @@ int ext_loop_example_main()
 	int flux_stamp[1000] = {0};
 
 	float kp_speed, ki_speed, kp_torque, kp_flux;
-	kp_speed =1.04;
-	ki_speed =0.006;
-	kp_torque =0.72;
-	kp_flux =0.72;
-	ref_speed =2000;
+	kp_speed = 1.04;
+	ki_speed = 0.006;
+	kp_torque = 0.72;
+	kp_flux = 0.72;
+	ref_speed = 2000;
 	struct sPI speed_pi = {
 		.fDtSec = 0.000500f,
 		.fKp = kp_speed,
@@ -105,83 +105,57 @@ int ext_loop_example_main()
 	if (ret)
 		goto remove_tmc4671;
 
-	ret = tmc4671_set_mode_motion(tmc4671_desc, TMC4671_UQ_UD_EXT);
-	if (ret)
-		goto remove_tmc4671;
-
 	/* Start Motor. */
-	ret = tmc4671_reg_write(tmc4671_desc, TMC4671_UQ_UD_EXT_REG, 0x0);
-	if (ret)
-		goto remove_tmc4671;
-
-	ret = tmc4671_reg_update(tmc4671_desc, TMC4671_PWM_SV_CHOP_REG, NO_OS_BIT(8),
-				 0x100);
-	if (ret)
-		goto remove_tmc4671;
-
 	ret = tmc4671_set_pwm_sv_chop(tmc4671_desc, TMC4671_PWM_CENTER);
 	if (ret)
 		goto remove_tmc4671;
 
+	ret = tmc4671_reg_update(tmc4671_desc, TMC4671_PWM_SV_CHOP_REG, NO_OS_BIT(8), 0x100);
+	if (ret)
+		goto remove_tmc4671;
+
+	/* Further TMC4671 DEVELOPMENT - TESTING */
+	ret = tmc4671_reg_write(tmc4671_desc, TMC4671_PID_TORQUE_P_TORQUE_I_REG, 0x00B40000);
+	if (ret)
+		goto remove_tmc4671;
+	
+	ret = tmc4671_reg_write(tmc4671_desc, TMC4671_PID_FLUX_P_FLUX_I_REG, 0x00B40000);
+	if (ret)
+		goto remove_tmc4671;
+
+	ret = tmc4671_reg_write(tmc4671_desc, TMC4671_PID_VELOCITY_P_VELOCITY_I_REG, 0x01010189);
+	if (ret)
+		goto remove_tmc4671;
+	
+	ret = tmc4671_reg_write(tmc4671_desc, TMC4671_PID_VELOCITY_TARGET_REG, 0);
+	if (ret)
+		goto remove_tmc4671;
+
+	ret = tmc4671_set_mode_motion(tmc4671_desc, TMC4671_VELOCITY_MODE);
+	if (ret)
+		goto remove_tmc4671;
+
+	ret = tmc4671_reg_write(tmc4671_desc, TMC4671_PID_VELOCITY_TARGET_REG, ref_speed);
+	if (ret)
+		goto remove_tmc4671;
+
 	/* Closed Loop Operation.*/
-	while (i < 10000) {
+	while (i < 100000) {
 		/* Outer Loop (Speed). */
 		ret = tmc4671_read_velocity(tmc4671_desc, &meas_speed);
 		if (ret)
 			return ret;
 
-		/* Speed PI Controller. */
-		speed_pi.fIn = ref_speed - meas_speed;
-
-		tPI_calc(&speed_pi);
-
-		/* Angle Reading for Clarke and Park transforms. */
-		ret = tmc4671_read_angle(tmc4671_desc, &angle);
+		ret = tmc4671_reg_read(tmc4671_desc, TMC4671_PID_TORQUE_FLUX_ACTUAL_REG,
+				       &reg_val);
 		if (ret)
-			goto stop_motor;
+			return ret;
 
-		elec_angle = DEG_TO_RAD(DEC_TO_DEG((float)angle));
+		uq = (int16_t)((reg_val >> 16) & 0xFFFF);
+		ud = (int16_t)(reg_val & 0xFFFF);
 
-		/* Inside Loop (Torque and Flux). */
-		ret = tmc4671_reg_read(tmc4671_desc, TMC4671_ADC_IWY_IUX_REG, &reg_val);
-		if (ret)
-			goto stop_motor;
-
-		ptFFClarke.fA = (float)(int16_t)(reg_val & 0xFFFF);
-		ptFFClarke.fC = (float)(int16_t)((reg_val >> 16) & 0xFFFF);
-		ptFFClarke.fB = (ptFFClarke.fA + ptFFClarke.fC) * (-1);
-
-		tFFClarke_abc2albe(&ptFFClarke);
-
-		ptFPark.fAl = ptFFClarke.fAl;
-		ptFPark.fBe = ptFFClarke.fBe;
-		ptFPark.fCosAng = cosf(elec_angle);
-		ptFPark.fSinAng = sinf(elec_angle);
-
-		tFPark_albe2dq(&ptFPark);
-
-		uq = (int16_t)ptFPark.fQ;
-		ud = (int16_t)ptFPark.fD;
-
-		torque_pi.fIn = RPM_TO_NQ(speed_pi.fOut) - uq;
-		flux_pi.fIn = 0 - ud;
-
-		/* Flux PI Controller. */
-		tP_calc(&flux_pi);
-		/* Torque PI Controller. */
-		tP_calc(&torque_pi);
-
-		uq = (int16_t)(torque_pi.fOut);
-		ud = (int16_t)(flux_pi.fOut);
-
-		uq_ud = (((uint32_t)uq << 16) & 0xFFFF0000) | ((uint32_t)ud & 0xFFFF);
-
-		ret = tmc4671_reg_write(tmc4671_desc, TMC4671_UQ_UD_EXT_REG, uq_ud);
-		if (ret)
-			goto stop_motor;
-
-		if (i % 10 == 0) {
-			j = i / 10;
+		if (i % 100 == 0) {
+			j = i / 100;
 			speed_stamp[j] = meas_speed;
 			torque_stamp[j] = uq;
 			flux_stamp[j] = ud;
@@ -190,11 +164,9 @@ int ext_loop_example_main()
 		i++;
 	}
 
-	ret = tmc4671_reg_write(tmc4671_desc, TMC4671_UQ_UD_EXT_REG, 0);
+	ret = tmc4671_set_pwm_sv_chop(tmc4671_desc, TMC4671_PWM_OFF);
 	if (ret)
 		goto stop_en;
-
-	ret = tmc4671_set_pwm_sv_chop(tmc4671_desc, TMC4671_PWM_OFF);
 
 	for (j = 0; j < 1000; j++)
 		pr_info("%i %i %i %i\n", j, speed_stamp[j], torque_stamp[j],
