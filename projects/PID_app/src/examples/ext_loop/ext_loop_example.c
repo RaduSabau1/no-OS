@@ -1,3 +1,35 @@
+/***************************************************************************//**
+ *   @file   ext_loop_example.c
+ *   @brief  External Speed, Torque and Flux loop control example for PID_App.
+ *   @author Radu Sabau (radu.sabau@analog.com)
+********************************************************************************
+ * Copyright 2026(c) Analog Devices, Inc.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of Analog Devices, Inc. nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ANALOG DEVICES, INC. "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ANALOG DEVICES, INC. BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************/
 #include "ext_loop_example.h"
 #include "common_data.h"
 #include "tmc6100.h"
@@ -32,17 +64,19 @@ int ext_loop_example_main()
 	int i = 0, j = 0, ret;
 	float elec_angle;
 	int16_t ud, uq;
+	uint32_t pwm_freq;
 
 	int speed_stamp[1000] = {0};
 	int torque_stamp[1000] = {0};
 	int flux_stamp[1000] = {0};
 
 	float kp_speed, ki_speed, kp_torque, kp_flux;
-	kp_speed =1.04;
-	ki_speed =0.006;
-	kp_torque =0.72;
-	kp_flux =0.72;
-	ref_speed =2000;
+	kp_speed = 1.04;
+	ki_speed = 0.006;
+	kp_torque = 0.72;
+	kp_flux = 0.72;
+	ref_speed = 2000;
+	pwm_freq = 50000;
 	struct sPI speed_pi = {
 		.fDtSec = 0.000500f,
 		.fKp = kp_speed,
@@ -93,7 +127,7 @@ int ext_loop_example_main()
 	if (ret)
 		goto remove_tmc4671;
 
-	ret = tmc4671_set_pwm_freq(tmc4671_desc, 50000);
+	ret = tmc4671_set_pwm_freq(tmc4671_desc, pwm_freq);
 	if (ret)
 		goto remove_tmc4671;
 

@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.webdeploy" plugin-version="1.0">
-  <configuration file="/home/radu/workspace/licenta/SOFTWARE/no-OS/projects/PID_app/motor_app.prj" location="/home/radu/workspace/licenta/SOFTWARE/no-OS/projects/PID_app" name="motor_app" target="target.webdeploy" target-name="Web App Compiler">
+  <configuration file="/home/radu/workspace/no-OS/projects/PID_app/motor_app.prj" location="/home/radu/workspace/no-OS/projects/PID_app" name="motor_app" target="target.webdeploy" target-name="Web App Compiler">
     <param.appname>motor_app</param.appname>
     <param.intermediate>${PROJECT_ROOT}/motor_app</param.intermediate>
     <param.files.only>${PROJECT_ROOT}/motor_app</param.files.only>
@@ -26,7 +26,7 @@
     <fileset.depfun />
     <fileset.package />
     <build-deliverables>
-      <file location="${PROJECT_ROOT}/motor_app" name="motor_app.ctf" optional="false">/home/radu/workspace/licenta/SOFTWARE/no-OS/projects/PID_app/motor_app/motor_app.ctf</file>
+      <file location="${PROJECT_ROOT}/motor_app" name="motor_app.ctf" optional="false">/home/radu/workspace/no-OS/projects/PID_app/motor_app/motor_app.ctf</file>
     </build-deliverables>
     <workflow />
     <matlab>
@@ -79,7 +79,7 @@
       <vista>false</vista>
       <linux>true</linux>
       <solaris>false</solaris>
-      <osver>6.11.0-26-generic</osver>
+      <osver>6.14.0-32-generic</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>glnxa64</arch>
