@@ -36,7 +36,6 @@
 
 #include "no_os_gpio.h"
 #include "no_os_spi.h"
-#include "no_os_pwm.h"
 #include "no_os_util.h"
 
 #define TMC6100_GCONF_REG		0x00
@@ -60,33 +59,8 @@
 #define TMC6100_BBM_MASK		NO_OS_GENMASK(4, 0)
 #define TMC6100_DRV_STRENGTH_MASK	NO_OS_GENMASK(19, 18)
 
-#define TMC6100_BLDC_UH_WL_SEQ		0x21
-#define TMC6100_BLDC_VH_WL_SEQ		0x09
-#define TMC6100_BLDC_UL_VH_SEQ		0x18
-#define TMC6100_BLDC_UL_WH_SEQ		0x12
-#define TMC6100_BLDC_VL_WH_SEQ		0x06
-#define TMC6100_BLDC_UH_VL_SEQ		0x24
-
 #define TMC6100_SENS_MAX		0x0F
 #define TMC6100_BBM_MAX			0x1F
-
-enum tmc6100_out_pin_sel {
-	TMC6100_UH,
-	TMC6100_UL,
-	TMC6100_VH,
-	TMC6100_VL,
-	TMC6100_WH,
-	TMC6100_WL,
-};
-
-enum tmc6100_bldc_sector {
-	TMC6100_BLDC_SECTOR_1,
-	TMC6100_BLDC_SECTOR_2,
-	TMC6100_BLDC_SECTOR_3,
-	TMC6100_BLDC_SECTOR_4,
-	TMC6100_BLDC_SECTOR_5,
-	TMC6100_BLDC_SECTOR_6,
-};
 
 enum tmc6100_fault_sel {
 	TMC6100_FAULT_OVC_OTP_ONLY,
@@ -135,38 +109,14 @@ enum tmc6100_drv_strength {
 
 struct tmc6100_init_param {
 	struct no_os_spi_init_param *comm_param;
-
 	struct no_os_gpio_init_param *drv_en_param;
-
-	struct no_os_pwm_init_param *uh_pwm_param;
-	struct no_os_pwm_init_param *vh_pwm_param;
-	struct no_os_pwm_init_param *wh_pwm_param;
-
-	struct no_os_pwm_init_param *ul_pwm_param;
-	struct no_os_pwm_init_param *vl_pwm_param;
-	struct no_os_pwm_init_param *wl_pwm_param;
-
-	uint32_t pwm_period_ns;
-	bool ext_ctrl;
 };
 
 struct tmc6100_desc {
 	struct no_os_spi_desc *comm_desc;
-
 	struct no_os_gpio_desc *drv_en_desc;
-
-	struct no_os_pwm_desc *uh_pwm_desc;
-	struct no_os_pwm_desc *vh_pwm_desc;
-	struct no_os_pwm_desc *wh_pwm_desc;
-
-	struct no_os_pwm_desc *ul_pwm_desc;
-	struct no_os_pwm_desc *vl_pwm_desc;
-	struct no_os_pwm_desc *wl_pwm_desc;
-
 	uint8_t buff[6];
 	enum tmc6100_interface interface;
-	uint32_t pwm_period_ns;
-	bool ext_ctrl;
 };
 
 int tmc6100_reg_read(struct tmc6100_desc *desc, uint8_t reg, uint32_t *val);
@@ -175,13 +125,6 @@ int tmc6100_reg_write(struct tmc6100_desc *desc, uint8_t reg, uint32_t val);
 
 int tmc6100_reg_update(struct tmc6100_desc *desc, uint8_t reg, uint32_t mask,
 		       uint32_t val);
-
-int tmc6100_set_duty(struct tmc6100_desc *desc, uint16_t duty_u,
-		     uint16_t duty_v, uint16_t duty_w);
-
-int tmc6100_start_bldc_motor(struct tmc6100_desc *desc);
-
-int tmc6100_stop_bldc_motor(struct tmc6100_desc *desc);
 
 int tmc6100_get_fault(struct tmc6100_desc *desc, enum tmc6100_fault_sel *fault);
 

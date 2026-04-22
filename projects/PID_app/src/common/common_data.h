@@ -34,7 +34,6 @@
 #define __COMMON_DATA_H__
 
 #include "platform_includes.h"
-#include "no_os_pwm.h"
 #include "tmc6100.h"
 #include "tmc4671.h"
 
