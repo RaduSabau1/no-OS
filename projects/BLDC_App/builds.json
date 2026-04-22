@@ -1,0 +1,7 @@
+{
+	"stm32": {
+		"foc_example_stm32f767": {
+			"flags" : "TARGET=stm32f767"
+		}
+	}
+}

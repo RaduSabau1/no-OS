@@ -1,0 +1,23 @@
+INCS += $(PLATFORM_DRIVERS)/stm32_gpio.h		\
+	$(PLATFORM_DRIVERS)/stm32_spi.h		\
+	$(PLATFORM_DRIVERS)/stm32_hal.h		\
+	$(PLATFORM_DRIVERS)/stm32_dma.h		\
+	$(PLATFORM_DRIVERS)/stm32_irq.h		\
+	$(PLATFORM_DRIVERS)/stm32_uart.h	\
+	$(PLATFORM_DRIVERS)/stm32_uart_stdio.h	\
+	$(PLATFORM_DRIVERS)/stm32_gpio_irq.h	\
+	$(PLATFORM_DRIVERS)/motor_pwm.h
+
+# TODO: add $(PLATFORM_DRIVERS)/stm32_adc.h once injected-channel ADC
+#       driver is available (required for synchronized current sampling).
+
+SRCS += $(PLATFORM_DRIVERS)/stm32_gpio.c	\
+	$(PLATFORM_DRIVERS)/stm32_irq.c	\
+	$(PLATFORM_DRIVERS)/stm32_delay.c	\
+	$(PLATFORM_DRIVERS)/stm32_uart.c	\
+	$(PLATFORM_DRIVERS)/stm32_spi.c	\
+	$(PLATFORM_DRIVERS)/stm32_uart_stdio.c	\
+	$(PLATFORM_DRIVERS)/stm32_gpio_irq.c	\
+	$(PLATFORM_DRIVERS)/motor_pwm.c
+
+# TODO: add $(PLATFORM_DRIVERS)/stm32_adc.c once available.
