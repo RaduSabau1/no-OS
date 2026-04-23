@@ -39,6 +39,7 @@
 #include "stm32_uart.h"
 #include "stm32_uart_stdio.h"
 #include "motor_pwm.h"
+#include "stm32_adc.h"
 
 /* UART */
 #define UART_IRQ_ID			USART3_IRQn
@@ -79,6 +80,43 @@ extern TIM_HandleTypeDef		htim1;
  * TODO: configure htim2 in the .ioc after hardware schematic is finalised. */
 extern TIM_HandleTypeDef		htim2;
 #define MOTOR_POLE_PAIRS		4
+
+/*
+ * ADC — phase current sensing, injected channels triggered by TIM1 TRGO.
+ *
+ * Clock: APB2 (108 MHz) / ADC_CLOCK_SYNC_PCLK_DIV4 = 27 MHz < 36 MHz limit.
+ * Iu and Iw are sampled from the TMC6100 eval board AD8418 amplifiers whose
+ * output is centred at VDDA/2 at zero current (bipolar topology). Iv is
+ * derived in software from KCL: Iv = -(Iu + Iw).
+ *
+ * Channel and pin numbers are placeholders — update from .ioc once the
+ * hardware schematic is finalised.
+ */
+extern ADC_HandleTypeDef		hadc1;
+#define MOTOR_ADC_HANDLE		(&hadc1)
+#define MOTOR_ADC_IU_CHANNEL		ADC_CHANNEL_3	/* TODO: verify from .ioc */
+#define MOTOR_ADC_IW_CHANNEL		ADC_CHANNEL_10	/* TODO: verify from .ioc */
+#define MOTOR_ADC_SAMPLING_TIME		ADC_SAMPLETIME_3CYCLES
+#define MOTOR_ADC_TRIGGER		ADC_EXTERNALTRIGINJECCONV_T1_TRGO
+#define MOTOR_ADC_TRIGGER_EDGE		ADC_EXTERNALTRIGINJECCONVEDGE_RISING
+
+/*
+ * Current conversion: I [A] = (raw_count - MIDPOINT) * CURRENT_SCALE
+ *
+ * CURRENT_SCALE = VREF_MV / (RESOLUTION * SHUNT_OHM * AMP_GAIN * 1000)
+ *
+ * Example values below are placeholders — replace with actual hardware specs.
+ * TODO: set MOTOR_SHUNT_RESISTANCE and MOTOR_CURRENT_GAIN from schematic.
+ */
+#define MOTOR_SHUNT_RESISTANCE		0.01f		/* shunt [Ω]  — TODO */
+#define MOTOR_CURRENT_GAIN		20.0f		/* amplifier gain — TODO */
+#define MOTOR_ADC_VREF_MV		3300.0f		/* VDDA [mV] */
+#define MOTOR_ADC_RESOLUTION		4096.0f		/* 12-bit, 2^12 counts */
+#define MOTOR_ADC_MIDPOINT		2048.0f		/* counts at zero current */
+#define MOTOR_ADC_CURRENT_SCALE \
+	(MOTOR_ADC_VREF_MV / \
+	 (MOTOR_ADC_RESOLUTION * MOTOR_SHUNT_RESISTANCE * \
+	  MOTOR_CURRENT_GAIN * 1000.0f))
 
 extern struct stm32_uart_init_param	bldc_uart_extra;
 extern struct stm32_gpio_init_param	bldc_gpio_extra;

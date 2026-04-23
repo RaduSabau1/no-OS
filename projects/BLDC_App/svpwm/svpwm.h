@@ -4,7 +4,7 @@
  *
  *           Takes the stationary-frame voltage references (Vα, Vβ) produced
  *           by the Inverse Park transform, determines the active sector, and
- *           computes the three-phase duty cycles (ta, tb, tc) to be written
+ *           computes the three-phase duty cycles (tu, tv, tw) to be written
  *           to the motor_pwm driver.
  *
  *   @author Radu Sabau (radu.sabau@analog.com)
@@ -46,9 +46,9 @@
  * Values are in timer ticks [0, period_ticks], ready for direct CCR write.
  */
 struct svpwm_out {
-	uint16_t ta;	/* Phase A CCR ticks */
-	uint16_t tb;	/* Phase B CCR ticks */
-	uint16_t tc;	/* Phase C CCR ticks */
+	uint16_t tu;	/* Phase U CCR ticks */
+	uint16_t tv;	/* Phase V CCR ticks */
+	uint16_t tw;	/* Phase W CCR ticks */
 };
 
 /**

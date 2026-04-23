@@ -72,3 +72,34 @@ struct motor_pwm_init_param motor_pwm_ip = {
 	.get_timer_clock = HAL_RCC_GetHCLKFreq,
 };
 
+/*
+ * Injected channel configuration for Iu (rank 1) and Iw (rank 2).
+ * Channel numbers are placeholders — update MOTOR_ADC_IU_CHANNEL and
+ * MOTOR_ADC_IW_CHANNEL in parameters.h after .ioc pin assignment.
+ * conv_cplt_cb is set to foc_tick() by foc_example_main() before calling
+ * stm32_adc_init(), keeping common_data free of example-layer dependencies.
+ */
+static struct stm32_adc_channel motor_adc_channels[] = {
+	{
+		.channel      = MOTOR_ADC_IU_CHANNEL,
+		.rank         = ADC_INJECTED_RANK_1,
+		.sampling_time = MOTOR_ADC_SAMPLING_TIME,
+		.offset       = 0,
+	},
+	{
+		.channel      = MOTOR_ADC_IW_CHANNEL,
+		.rank         = ADC_INJECTED_RANK_2,
+		.sampling_time = MOTOR_ADC_SAMPLING_TIME,
+		.offset       = 0,
+	},
+};
+
+struct stm32_adc_init_param adc_ip = {
+	.hadc             = MOTOR_ADC_HANDLE,
+	.num_channels     = NO_OS_ARRAY_SIZE(motor_adc_channels),
+	.channels         = motor_adc_channels,
+	.ext_trigger      = MOTOR_ADC_TRIGGER,
+	.ext_trigger_edge = MOTOR_ADC_TRIGGER_EDGE,
+	.conv_cplt_cb     = NULL, /* set to foc_tick() in foc_example_main() */
+};
+

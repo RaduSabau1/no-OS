@@ -107,13 +107,13 @@ int motor_pwm_remove(struct motor_pwm_desc *desc);
  * this when called with the same period_ticks as the timer ARR.
  *
  * @param desc  Driver descriptor.
- * @param ta    Phase A CCR value [ticks].
- * @param tb    Phase B CCR value [ticks].
- * @param tc    Phase C CCR value [ticks].
+ * @param tu    Phase U CCR value [ticks].
+ * @param tv    Phase V CCR value [ticks].
+ * @param tw    Phase W CCR value [ticks].
  * @return 0 on success, negative error code otherwise.
  */
 int motor_pwm_set_duty(struct motor_pwm_desc *desc,
-		       uint16_t ta, uint16_t tb, uint16_t tc);
+		       uint16_t tu, uint16_t tv, uint16_t tw);
 
 /**
  * @brief Enable PWM outputs (sets MOE bit in BDTR, starts all channels).

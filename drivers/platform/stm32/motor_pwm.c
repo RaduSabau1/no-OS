@@ -174,7 +174,7 @@ int motor_pwm_remove(struct motor_pwm_desc *desc)
 }
 
 int motor_pwm_set_duty(struct motor_pwm_desc *desc,
-		       uint16_t ta, uint16_t tb, uint16_t tc)
+		       uint16_t tu, uint16_t tv, uint16_t tw)
 {
 	TIM_TypeDef *tim;
 
@@ -184,9 +184,9 @@ int motor_pwm_set_duty(struct motor_pwm_desc *desc,
 	tim = ((TIM_HandleTypeDef *)desc->htimer)->Instance;
 
 	/* Direct CCR writes — effective at next timer update event. */
-	tim->CCR1 = ta;
-	tim->CCR2 = tb;
-	tim->CCR3 = tc;
+	tim->CCR1 = tu;
+	tim->CCR2 = tv;
+	tim->CCR3 = tw;
 
 	return 0;
 }

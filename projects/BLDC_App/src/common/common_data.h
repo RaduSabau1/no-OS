@@ -47,4 +47,7 @@ extern struct tmc6100_init_param	tmc6100_ip;
 /* Motor 3-phase PWM (motor_pwm driver, TIM1) */
 extern struct motor_pwm_init_param	motor_pwm_ip;
 
+/* ADC injected channels for phase current sensing (stm32_adc driver) */
+extern struct stm32_adc_init_param	adc_ip;
+
 #endif /* __COMMON_DATA_H__ */

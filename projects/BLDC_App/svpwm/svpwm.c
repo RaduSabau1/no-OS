@@ -45,9 +45,9 @@
  *   ...
  *
  * Duty cycles are computed as:
- *   ta = (1 + t1 - t2) / 2
- *   tb = (1 - t1 + t2) / 2   (varies by sector, see below)
- *   tc = (1 - t1 - t2) / 2
+ *   tu = (1 + t1 - t2) / 2
+ *   tv = (1 - t1 + t2) / 2   (varies by sector, see below)
+ *   tw = (1 - t1 - t2) / 2
  *
  * where t1, t2 are the normalised active-vector times [0, 1].
  */
@@ -129,35 +129,35 @@ void svpwm_compute(float v_alpha, float v_beta, float v_dc,
 	/* CCR tick values per sector — multiply normalised duty by period_ticks. */
 	switch (sector) {
 	case 1:
-		out->ta = (uint16_t)((t1 + t2 + t0) * pt);
-		out->tb = (uint16_t)((t2 + t0)       * pt);
-		out->tc = (uint16_t)(t0               * pt);
+		out->tu = (uint16_t)((t1 + t2 + t0) * pt);
+		out->tv = (uint16_t)((t2 + t0)       * pt);
+		out->tw = (uint16_t)(t0               * pt);
 		break;
 	case 2:
-		out->ta = (uint16_t)((t1 + t0)       * pt);
-		out->tb = (uint16_t)((t1 + t2 + t0)  * pt);
-		out->tc = (uint16_t)(t0               * pt);
+		out->tu = (uint16_t)((t1 + t0)       * pt);
+		out->tv = (uint16_t)((t1 + t2 + t0)  * pt);
+		out->tw = (uint16_t)(t0               * pt);
 		break;
 	case 3:
-		out->ta = (uint16_t)(t0               * pt);
-		out->tb = (uint16_t)((t1 + t2 + t0)  * pt);
-		out->tc = (uint16_t)((t2 + t0)        * pt);
+		out->tu = (uint16_t)(t0               * pt);
+		out->tv = (uint16_t)((t1 + t2 + t0)  * pt);
+		out->tw = (uint16_t)((t2 + t0)        * pt);
 		break;
 	case 4:
-		out->ta = (uint16_t)(t0               * pt);
-		out->tb = (uint16_t)((t1 + t0)        * pt);
-		out->tc = (uint16_t)((t1 + t2 + t0)  * pt);
+		out->tu = (uint16_t)(t0               * pt);
+		out->tv = (uint16_t)((t1 + t0)        * pt);
+		out->tw = (uint16_t)((t1 + t2 + t0)  * pt);
 		break;
 	case 5:
-		out->ta = (uint16_t)((t2 + t0)        * pt);
-		out->tb = (uint16_t)(t0               * pt);
-		out->tc = (uint16_t)((t1 + t2 + t0)  * pt);
+		out->tu = (uint16_t)((t2 + t0)        * pt);
+		out->tv = (uint16_t)(t0               * pt);
+		out->tw = (uint16_t)((t1 + t2 + t0)  * pt);
 		break;
 	case 6:
 	default:
-		out->ta = (uint16_t)((t1 + t2 + t0)  * pt);
-		out->tb = (uint16_t)(t0               * pt);
-		out->tc = (uint16_t)((t1 + t0)        * pt);
+		out->tu = (uint16_t)((t1 + t2 + t0)  * pt);
+		out->tv = (uint16_t)(t0               * pt);
+		out->tw = (uint16_t)((t1 + t0)        * pt);
 		break;
 	}
 }
